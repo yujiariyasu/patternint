@@ -103,28 +103,11 @@
             }
         </style>
         <script>
-            (function () {
-                const isDarkMode = !(
-                    localStorage.getItem('dark-mode') === 'false'
-                    || !('dark-mode' in localStorage)
-                );
-
-                document.documentElement.classList.toggle('dark', isDarkMode);
-                window.__PI_DARK_MODE = isDarkMode;
-                window.__PI_THEME_SUFFIX = isDarkMode ? '_white' : '_black';
-
-                [
-                    './images/user-image.png',
-                    `./images/rsna_2024${window.__PI_THEME_SUFFIX}.png`,
-                    `./images/hms${window.__PI_THEME_SUFFIX}.png`
-                ].forEach((href) => {
-                    const preload = document.createElement('link');
-                    preload.rel = 'preload';
-                    preload.as = 'image';
-                    preload.href = href;
-                    document.head.appendChild(preload);
-                });
-            }());
+            if (localStorage.getItem('dark-mode') === 'false' || !('dark-mode' in localStorage)) {
+                document.querySelector('html').classList.remove('dark');
+            } else {
+                document.querySelector('html').classList.add('dark');
+            }
         </script>
     </head>
 
@@ -161,7 +144,7 @@
                                 </div>
                                 <!-- Intro -->
                                 <div class="mb-10">
-                                    <img class="inline-flex rounded-full shadow-lg mb-4" src="./images/user-image.png" width="48" height="48" alt="Pattern Intelligence Inc." loading="eager" decoding="async" fetchpriority="high" />
+                                    <img class="inline-flex rounded-full shadow-lg mb-4" src="./images/user-image.png" width="48" height="48" alt="Pattern Intelligence Inc." />
                                     <div class="mb-5">
                                         <h1 class="font-inter-tight font-bold text-gray-800 dark:text-gray-100 text-2xl mb-1">Pattern Intelligence Inc.</h1>
                                         <p class="text-sm text-gray-600 dark:text-gray-400">AI for Computer Vision</p>
@@ -178,44 +161,30 @@
                                     <h2 class="font-inter-tight text-lg font-semibold text-gray-800 dark:text-gray-100 mb-6">Article</h2>
                                     <div id="article-showcase" class="mx-auto mt-8">
                                         <a data-showcase-card href="https://www.kaggle.com/competitions/rsna-2024-lumbar-spine-degenerative-classification/writeups/ianpan-kevin-yuji-bartley-2nd-place-solution#3012378" target="_blank" rel="noopener noreferrer" aria-label="Open product screenshot 01 in a new window">
-                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/rsna_2024_black.png" data-dark-src="./images/rsna_2024_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" loading="eager" decoding="async" fetchpriority="high" width="2748" height="746" alt="Product screenshot 01" />
+                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" src="./images/rsna_2024_black.png" width="2748" height="746" alt="Product screenshot 01" />
                                         </a>
                                         <a data-showcase-card href="https://www.kaggle.com/competitions/hms-harmful-brain-activity-classification/writeups/aillis-go-bilzard-4th-place-solution#2742639" target="_blank" rel="noopener noreferrer" aria-label="Open product screenshot 02 in a new window">
-                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/hms_black.png" data-dark-src="./images/hms_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" loading="eager" decoding="async" fetchpriority="high" width="2748" height="746" alt="Product screenshot 02" />
+                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" src="./images/hms_black.png" width="2748" height="746" alt="Product screenshot 02" />
                                         </a>
                                         <a data-showcase-card href="https://www.kaggle.com/competitions/siim-covid19-detection/writeups/aillis-yuji-ian-3rd-place-solution" target="_blank" rel="noopener noreferrer" aria-label="Open product screenshot 03 in a new window">
-                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/siim_rsna_black.png" data-dark-src="./images/siim_rsna_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" loading="lazy" decoding="async" fetchpriority="low" width="2748" height="746" alt="Product screenshot 03" />
+                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" src="./images/siim_rsna_black.png" width="2748" height="746" alt="Product screenshot 03" />
                                         </a>
                                         <a data-showcase-card href="https://www.kaggle.com/competitions/rsna-2023-abdominal-trauma-detection/writeups/aillis-jp-yuji-ariyasu-3rd-place-solution" target="_blank" rel="noopener noreferrer" aria-label="Open product screenshot 04 in a new window">
-                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/rsna_2023_black.png" data-dark-src="./images/rsna_2023_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" loading="lazy" decoding="async" fetchpriority="low" width="2748" height="746" alt="Product screenshot 04" />
+                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" src="./images/rsna_2023_black.png" width="2748" height="746" alt="Product screenshot 04" />
                                         </a>
                                         <a data-showcase-card href="https://www.kaggle.com/competitions/rsna-breast-cancer-detection/writeups/chiral-mistrals-6th-place-solution-multi-view-mult" target="_blank" rel="noopener noreferrer" aria-label="Open product screenshot 05 in a new window">
-                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/rsna_mammo_black.png" data-dark-src="./images/rsna_mammo_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" loading="lazy" decoding="async" fetchpriority="low" width="2748" height="746" alt="Product screenshot 05" />
+                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" src="./images/rsna_mammo_black.png" width="2748" height="746" alt="Product screenshot 05" />
                                         </a>
                                         <a data-showcase-card href="https://www.kaggle.com/competitions/benetech-making-graphs-accessible/discussion/418706" target="_blank" rel="noopener noreferrer" aria-label="Open product screenshot 06 in a new window">
-                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/benetech_black.png" data-dark-src="./images/benetech_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" loading="lazy" decoding="async" fetchpriority="low" width="2748" height="746" alt="Product screenshot 06" />
+                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" src="./images/benetech_black.png" width="2748" height="746" alt="Product screenshot 06" />
                                         </a>
                                         <a data-showcase-card href="https://www.kaggle.com/competitions/happy-whale-and-dolphin/writeups/aillis-jp-yujiariyasu-6th-place-solution" target="_blank" rel="noopener noreferrer" aria-label="Open product screenshot 07 in a new window">
-                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/happy_whale_black.png" data-dark-src="./images/happy_whale_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" loading="lazy" decoding="async" fetchpriority="low" width="2748" height="746" alt="Product screenshot 07" />
+                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" src="./images/happy_whale_black.png" width="2748" height="746" alt="Product screenshot 07" />
                                         </a>
                                         <a data-showcase-card href="https://www.kaggle.com/competitions/rsna-str-pulmonary-embolism-detection/writeups/aillis-yuji-jan-yama-provisional-8th-place-solutio" target="_blank" rel="noopener noreferrer" aria-label="Open product screenshot 08 in a new window">
-                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/rsna_str_black.png" data-dark-src="./images/rsna_str_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" loading="lazy" decoding="async" fetchpriority="low" width="2774" height="746" alt="Product screenshot 08" />
+                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" src="./images/rsna_str_black.png" width="2774" height="746" alt="Product screenshot 08" />
                                         </a>
                                     </div>
-                                    <script>
-                                        (function () {
-                                            const showcaseImages = document.querySelectorAll('#article-showcase [data-showcase-image]');
-                                            const isDarkMode = document.documentElement.classList.contains('dark');
-
-                                            showcaseImages.forEach((image) => {
-                                                const nextSrc = isDarkMode ? image.dataset.darkSrc : image.dataset.lightSrc;
-
-                                                if (nextSrc && image.getAttribute('src') !== nextSrc) {
-                                                    image.setAttribute('src', nextSrc);
-                                                }
-                                            });
-                                        }());
-                                    </script>
                                 </section>
 
                                 <!-- <section>
@@ -334,6 +303,7 @@
                 const showcaseImages = cards
                     .map((card) => card.querySelector('[data-showcase-image]'))
                     .filter(Boolean);
+                const themedImagePattern = /_(black|white)(\.[^./?#]+)$/i;
                 const overlayWidthRatio = 0.52;
                 const overlayMaxWidth = 780;
                 const overlayHeightRatio = 0.50;
@@ -433,16 +403,20 @@
                     applyPreviewState(null);
                 };
 
-                const getThemedImageSrc = (image, isDarkMode) => (
-                    isDarkMode ? image.dataset.darkSrc : image.dataset.lightSrc
-                );
+                const getThemedImageSrc = (src, isDarkMode) => {
+                    if (!src || !themedImagePattern.test(src)) {
+                        return src;
+                    }
+
+                    return src.replace(themedImagePattern, isDarkMode ? '_white$2' : '_black$2');
+                };
 
                 const syncThemeImages = () => {
                     const isDarkMode = document.documentElement.classList.contains('dark');
 
                     showcaseImages.forEach((image) => {
                         const currentSrc = image.getAttribute('src');
-                        const nextSrc = getThemedImageSrc(image, isDarkMode);
+                        const nextSrc = getThemedImageSrc(currentSrc, isDarkMode);
 
                         if (nextSrc && nextSrc !== currentSrc) {
                             image.setAttribute('src', nextSrc);
