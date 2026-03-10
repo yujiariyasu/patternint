@@ -4,224 +4,35 @@
     <head>
         <meta charset="utf-8">
         <meta name="google" content="notranslate">
-        <title>Pattern Intelligence</title>
+        <title>DevFolio HTML Demo - Home</title>
         <meta name="viewport" content="width=device-width,initial-scale=1">
         <link href="./style.css" rel="stylesheet">
         <style>
-            html.dark .site-panel {
-                background-color: #182132;
+            .brand-logo-white {
+                display: none;
             }
 
-            #article-showcase {
-                display: grid;
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 1rem;
-                max-width: 720px;
-                isolation: isolate;
+            html.dark .brand-logo-black {
+                display: none;
             }
 
-            #article-showcase [data-showcase-card] {
-                display: block;
-                position: relative;
-            }
-
-            #article-showcase [data-showcase-image] {
-                display: block;
-                width: 100%;
-                height: auto;
-                cursor: pointer;
-                image-rendering: auto;
-                backface-visibility: hidden;
-                -webkit-backface-visibility: hidden;
-                transform: var(--rest-transform);
-                transform-origin: center center;
-                transition: transform 860ms cubic-bezier(.22, 1, .36, 1), box-shadow 860ms ease, filter 680ms ease, opacity 680ms ease;
-                box-shadow: 0 18px 40px rgba(15, 23, 42, 0.14);
-                will-change: transform, filter;
-            }
-
-            #article-showcase.has-active [data-showcase-image] {
-                filter: blur(0.75px) saturate(.97) brightness(.98);
-                opacity: 0.78;
-                transform: var(--muted-transform);
-                box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
-            }
-
-            #article-showcase [data-showcase-card].is-source {
-                z-index: 4;
-            }
-
-            #article-showcase [data-showcase-card].is-source [data-showcase-image] {
-                filter: none;
-                opacity: 1;
-                transform: var(--source-transform, var(--rest-transform));
-                box-shadow: 0 24px 54px rgba(15, 23, 42, 0.18);
-            }
-
-            #showcase-overlay {
-                position: fixed;
-                inset: 0;
-                z-index: 60;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                opacity: 0;
-                visibility: hidden;
-                pointer-events: none;
-                transition: opacity 420ms ease, visibility 0s linear 420ms;
-            }
-
-            #showcase-overlay.is-visible {
-                opacity: 1;
-                visibility: visible;
-                transition: opacity 420ms ease;
-            }
-
-            #showcase-overlay-link {
-                display: block;
-                pointer-events: auto;
-                transform: translate3d(var(--overlay-offset-x, 0), var(--overlay-offset-y, 0), 0) scale(var(--overlay-start-scale, .86));
-                transform-origin: center center;
-                transition: transform 860ms cubic-bezier(.22, 1, .36, 1);
-                will-change: transform;
-            }
-
-            #showcase-overlay.is-visible #showcase-overlay-link {
-                transform: translate3d(var(--overlay-offset-x, 0), var(--overlay-offset-y, 0), 0) scale(1);
-            }
-
-            #showcase-overlay img {
-                display: block;
-                width: min(52vw, 780px);
-                height: auto;
-                max-height: 50vh;
-                border-radius: 24px;
-                box-shadow: 0 52px 120px rgba(15, 23, 42, 0.34);
-                image-rendering: auto;
-                backface-visibility: hidden;
-                -webkit-backface-visibility: hidden;
+            html.dark .brand-logo-white {
+                display: inline-flex;
             }
         </style>
         <script>
-            (function () {
-                const isDarkMode = !(
-                    localStorage.getItem('dark-mode') === 'false'
-                    || !('dark-mode' in localStorage)
-                );
-                const gridImageSizes = '(max-width: 767px) calc((100vw - 2.5rem) / 2), 292px';
-
-                document.documentElement.classList.toggle('dark', isDarkMode);
-                window.__PI_DARK_MODE = isDarkMode;
-                window.__PI_GRID_IMAGE_SIZES = gridImageSizes;
-
-                window.__PI_GET_THEME_SOURCE_CONFIG = function (image, isDarkMode) {
-                    const prefix = isDarkMode ? 'dark' : 'light';
-                    const read = (suffix) => image.dataset[`${prefix}${suffix}`];
-
-                    return {
-                        src: read('Src'),
-                        srcset: read('Srcset'),
-                        previewSrc: read('PreviewSrc'),
-                        fallbackSrc: read('FallbackSrc'),
-                        fallbackPreviewSrc: read('FallbackPreviewSrc') || read('FallbackSrc'),
-                    };
-                };
-
-                window.__PI_BIND_IMAGE_FALLBACK = function (image) {
-                    if (!image || image.dataset.fallbackBound === 'true') {
-                        return;
-                    }
-
-                    image.dataset.fallbackBound = 'true';
-                    image.addEventListener('error', () => {
-                        const fallbackSrc = image.dataset.fallbackSrc;
-
-                        if (!fallbackSrc || image.dataset.usingFallback === 'true') {
-                            return;
-                        }
-
-                        image.dataset.usingFallback = 'true';
-                        image.removeAttribute('srcset');
-                        image.setAttribute('src', fallbackSrc);
-                        image.dataset.previewSrc = image.dataset.fallbackPreviewSrc || fallbackSrc;
-                    });
-                };
-
-                window.__PI_APPLY_THEME_SOURCE = function (image, isDarkMode) {
-                    const config = window.__PI_GET_THEME_SOURCE_CONFIG(image, isDarkMode);
-
-                    if (!config || !config.src) {
-                        return;
-                    }
-
-                    image.dataset.usingFallback = 'false';
-                    image.dataset.fallbackSrc = config.fallbackSrc || '';
-                    image.dataset.fallbackPreviewSrc = config.fallbackPreviewSrc || config.fallbackSrc || config.src;
-                    image.dataset.previewSrc = config.previewSrc || image.dataset.fallbackPreviewSrc || config.src;
-
-                    if (config.srcset) {
-                        image.setAttribute('srcset', config.srcset);
-                    } else {
-                        image.removeAttribute('srcset');
-                    }
-
-                    image.setAttribute('sizes', window.__PI_GRID_IMAGE_SIZES);
-
-                    if (image.getAttribute('src') !== config.src) {
-                        image.setAttribute('src', config.src);
-                    }
-                };
-
-                const addImagePreload = ({ href, srcset, sizes }) => {
-                    const preload = document.createElement('link');
-                    preload.rel = 'preload';
-                    preload.as = 'image';
-                    preload.href = href;
-
-                    if (srcset) {
-                        preload.setAttribute('imagesrcset', srcset);
-                    }
-
-                    if (sizes) {
-                        preload.setAttribute('imagesizes', sizes);
-                    }
-
-                    document.head.appendChild(preload);
-                };
-
-                const themeStem = isDarkMode ? 'white' : 'black';
-
-                addImagePreload({
-                    href: './images/optimized/user-image-48.webp',
-                    srcset: [
-                        './images/optimized/user-image-48.webp 48w',
-                        './images/optimized/user-image-96.webp 96w',
-                        './images/optimized/user-image-192.webp 192w',
-                    ].join(', '),
-                    sizes: '48px',
-                });
-
-                [
-                    'rsna_2024',
-                    'hms',
-                ].forEach((baseName) => {
-                    addImagePreload({
-                        href: `./images/optimized/${baseName}_${themeStem}-360.webp`,
-                        srcset: [
-                            `./images/optimized/${baseName}_${themeStem}-360.webp 360w`,
-                            `./images/optimized/${baseName}_${themeStem}-720.webp 720w`,
-                        ].join(', '),
-                        sizes: gridImageSizes,
-                    });
-                });
-            }());
+            if (localStorage.getItem('dark-mode') === 'false' || !('dark-mode' in localStorage)) {
+                document.querySelector('html').classList.remove('dark');
+            } else {
+                document.querySelector('html').classList.add('dark');
+            }
         </script>
     </head>
 
     <body class="font-inter antialiased bg-gray-50 text-gray-800 dark:bg-gray-950 dark:text-gray-100 tracking-tight">
         <div class="overflow-hidden supports-[overflow:clip]:overflow-clip">
             <div class="max-w-[728px] mx-auto">
-                <div class="site-panel w-full bg-white dark:bg-gray-900 border-x border-gray-100 dark:border-gray-800 box-content">
+                <div class="w-full bg-white dark:bg-gray-900 border-x border-gray-100 dark:border-gray-800 box-content">
                     <div class="px-3 md:px-16">
                         <div class="flex flex-col min-h-screen">
         
@@ -251,140 +62,155 @@
                                 </div>
                                 <!-- Intro -->
                                 <div class="mb-10">
-                                    <img class="inline-flex rounded-full shadow-lg mb-4" src="./images/optimized/user-image-48.webp" srcset="./images/optimized/user-image-48.webp 48w, ./images/optimized/user-image-96.webp 96w, ./images/optimized/user-image-192.webp 192w" sizes="48px" width="48" height="48" alt="Pattern Intelligence Inc." loading="eager" decoding="async" fetchpriority="high" onerror="this.onerror=null;this.removeAttribute('srcset');this.src='./images/user-image.png';" />
+                                    <img class="inline-flex brand-logo-black" style="margin-top:-40px;margin-bottom:-28px;" src="./images/logo_black.svg" width="144" height="144" alt="Pattern Intelligence logo" />
+                                    <img class="brand-logo-white" style="margin-top:-40px;margin-bottom:-28px;" src="./images/logo_white.svg" width="144" height="144" alt="Pattern Intelligence logo" />
                                     <div class="mb-5">
                                         <h1 class="font-inter-tight font-bold text-gray-800 dark:text-gray-100 text-2xl mb-1">Pattern Intelligence Inc.</h1>
-                                        <p class="text-sm text-gray-600 dark:text-gray-400">AI for Computer Vision</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">Computer Vision AI<br>Kaggle Grandmasters Only</p>
                                     </div>
                                     <!-- <a class="btn-sm text-gray-200 dark:text-gray-800 bg-linear-to-r from-gray-800 to-gray-700 dark:from-gray-300 dark:to-gray-100 dark:hover:bg-gray-100 shadow-sm relative before:absolute before:inset-0 before:rounded-[inherit] before:bg-linear-[45deg,transparent_25%,var(--color-white)_50%,transparent_75%,transparent_100%] before:opacity-20 dark:before:opacity-100 dark:before:bg-linear-[45deg,transparent_25%,var(--color-white)_50%,transparent_75%,transparent_100%] before:bg-[length:250%_250%,100%_100%] before:bg-[position:200%_0,0_0] before:bg-no-repeat before:[transition:background-position_0s_ease] hover:before:bg-[position:-100%_0,0_0] hover:before:duration-1500" href="#0">Available For Work</a> -->
+                                </div>
+                                <div class="group flex justify-center gap-4">
+                                    <img class="rounded-xl even:rotate-2 odd:-rotate-2 group-hover:even:rotate-0 group-hover:odd:rotate-0 transition duration-300 ease-[cubic-bezier(.5,.85,.25,1.8)] shadow-lg" src="./images/header-image-04.png" width="245" height="160" alt="Header 01" />
+                                    <img class="rounded-xl even:rotate-2 odd:-rotate-2 group-hover:even:rotate-0 group-hover:odd:rotate-0 transition duration-300 ease-[cubic-bezier(.5,.85,.25,1.8)] shadow-lg" src="./images/header-image-05.png" width="245" height="160" alt="Header 02" />
+                                    <img class="rounded-xl even:rotate-2 odd:-rotate-2 group-hover:even:rotate-0 group-hover:odd:rotate-0 transition duration-300 ease-[cubic-bezier(.5,.85,.25,1.8)] shadow-lg" src="./images/header-image-03.png" width="245" height="160" alt="Header 03" />
                                 </div>
                             </header>
         
                             <!-- Content -->
-                            <main class="grow pt-8 pb-16 space-y-12">
-        
-                                <!-- article -->
+                            <main class="grow py-12 space-y-12">
+                                <!-- About -->
                                 <section>
-                                    <h2 class="font-inter-tight text-lg font-semibold text-gray-800 dark:text-gray-100 mb-6">Article</h2>
-                                    <div id="article-showcase" class="mx-auto mt-8">
-                                        <a data-showcase-card href="https://www.kaggle.com/competitions/rsna-2024-lumbar-spine-degenerative-classification/writeups/ianpan-kevin-yuji-bartley-2nd-place-solution#3012378" target="_blank" rel="noopener noreferrer" aria-label="Open product screenshot 01 in a new window">
-                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/optimized/rsna_2024_black-360.webp" data-light-srcset="./images/optimized/rsna_2024_black-360.webp 360w, ./images/optimized/rsna_2024_black-720.webp 720w" data-light-preview-src="./images/optimized/rsna_2024_black-1200.webp" data-light-fallback-src="./images/rsna_2024_black.png" data-light-fallback-preview-src="./images/rsna_2024_black.png" data-dark-src="./images/optimized/rsna_2024_white-360.webp" data-dark-srcset="./images/optimized/rsna_2024_white-360.webp 360w, ./images/optimized/rsna_2024_white-720.webp 720w" data-dark-preview-src="./images/optimized/rsna_2024_white-1200.webp" data-dark-fallback-src="./images/rsna_2024_white.png" data-dark-fallback-preview-src="./images/rsna_2024_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" sizes="(max-width: 767px) calc((100vw - 2.5rem) / 2), 292px" loading="eager" decoding="async" fetchpriority="high" width="2748" height="746" alt="Product screenshot 01" />
-                                        </a>
-                                        <a data-showcase-card href="https://www.kaggle.com/competitions/hms-harmful-brain-activity-classification/writeups/aillis-go-bilzard-4th-place-solution#2742639" target="_blank" rel="noopener noreferrer" aria-label="Open product screenshot 02 in a new window">
-                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/optimized/hms_black-360.webp" data-light-srcset="./images/optimized/hms_black-360.webp 360w, ./images/optimized/hms_black-720.webp 720w" data-light-preview-src="./images/optimized/hms_black-1200.webp" data-light-fallback-src="./images/hms_black.png" data-light-fallback-preview-src="./images/hms_black.png" data-dark-src="./images/optimized/hms_white-360.webp" data-dark-srcset="./images/optimized/hms_white-360.webp 360w, ./images/optimized/hms_white-720.webp 720w" data-dark-preview-src="./images/optimized/hms_white-1200.webp" data-dark-fallback-src="./images/hms_white.png" data-dark-fallback-preview-src="./images/hms_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" sizes="(max-width: 767px) calc((100vw - 2.5rem) / 2), 292px" loading="eager" decoding="async" fetchpriority="high" width="2748" height="746" alt="Product screenshot 02" />
-                                        </a>
-                                        <a data-showcase-card href="https://www.kaggle.com/competitions/siim-covid19-detection/writeups/aillis-yuji-ian-3rd-place-solution" target="_blank" rel="noopener noreferrer" aria-label="Open product screenshot 03 in a new window">
-                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/optimized/siim_rsna_black-360.webp" data-light-srcset="./images/optimized/siim_rsna_black-360.webp 360w, ./images/optimized/siim_rsna_black-720.webp 720w" data-light-preview-src="./images/optimized/siim_rsna_black-1200.webp" data-light-fallback-src="./images/siim_rsna_black.png" data-light-fallback-preview-src="./images/siim_rsna_black.png" data-dark-src="./images/optimized/siim_rsna_white-360.webp" data-dark-srcset="./images/optimized/siim_rsna_white-360.webp 360w, ./images/optimized/siim_rsna_white-720.webp 720w" data-dark-preview-src="./images/optimized/siim_rsna_white-1200.webp" data-dark-fallback-src="./images/siim_rsna_white.png" data-dark-fallback-preview-src="./images/siim_rsna_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" sizes="(max-width: 767px) calc((100vw - 2.5rem) / 2), 292px" loading="lazy" decoding="async" fetchpriority="low" width="2748" height="746" alt="Product screenshot 03" />
-                                        </a>
-                                        <a data-showcase-card href="https://www.kaggle.com/competitions/rsna-2023-abdominal-trauma-detection/writeups/aillis-jp-yuji-ariyasu-3rd-place-solution" target="_blank" rel="noopener noreferrer" aria-label="Open product screenshot 04 in a new window">
-                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/optimized/rsna_2023_black-360.webp" data-light-srcset="./images/optimized/rsna_2023_black-360.webp 360w, ./images/optimized/rsna_2023_black-720.webp 720w" data-light-preview-src="./images/optimized/rsna_2023_black-1200.webp" data-light-fallback-src="./images/rsna_2023_black.png" data-light-fallback-preview-src="./images/rsna_2023_black.png" data-dark-src="./images/optimized/rsna_2023_white-360.webp" data-dark-srcset="./images/optimized/rsna_2023_white-360.webp 360w, ./images/optimized/rsna_2023_white-720.webp 720w" data-dark-preview-src="./images/optimized/rsna_2023_white-1200.webp" data-dark-fallback-src="./images/rsna_2023_white.png" data-dark-fallback-preview-src="./images/rsna_2023_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" sizes="(max-width: 767px) calc((100vw - 2.5rem) / 2), 292px" loading="lazy" decoding="async" fetchpriority="low" width="2748" height="746" alt="Product screenshot 04" />
-                                        </a>
-                                        <a data-showcase-card href="https://www.kaggle.com/competitions/rsna-breast-cancer-detection/writeups/chiral-mistrals-6th-place-solution-multi-view-mult" target="_blank" rel="noopener noreferrer" aria-label="Open product screenshot 05 in a new window">
-                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/optimized/rsna_mammo_black-360.webp" data-light-srcset="./images/optimized/rsna_mammo_black-360.webp 360w, ./images/optimized/rsna_mammo_black-720.webp 720w" data-light-preview-src="./images/optimized/rsna_mammo_black-1200.webp" data-light-fallback-src="./images/rsna_mammo_black.png" data-light-fallback-preview-src="./images/rsna_mammo_black.png" data-dark-src="./images/optimized/rsna_mammo_white-360.webp" data-dark-srcset="./images/optimized/rsna_mammo_white-360.webp 360w, ./images/optimized/rsna_mammo_white-720.webp 720w" data-dark-preview-src="./images/optimized/rsna_mammo_white-1200.webp" data-dark-fallback-src="./images/rsna_mammo_white.png" data-dark-fallback-preview-src="./images/rsna_mammo_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" sizes="(max-width: 767px) calc((100vw - 2.5rem) / 2), 292px" loading="lazy" decoding="async" fetchpriority="low" width="2748" height="746" alt="Product screenshot 05" />
-                                        </a>
-                                        <a data-showcase-card href="https://www.kaggle.com/competitions/benetech-making-graphs-accessible/discussion/418706" target="_blank" rel="noopener noreferrer" aria-label="Open product screenshot 06 in a new window">
-                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/optimized/benetech_black-360.webp" data-light-srcset="./images/optimized/benetech_black-360.webp 360w, ./images/optimized/benetech_black-720.webp 720w" data-light-preview-src="./images/optimized/benetech_black-1200.webp" data-light-fallback-src="./images/benetech_black.png" data-light-fallback-preview-src="./images/benetech_black.png" data-dark-src="./images/optimized/benetech_white-360.webp" data-dark-srcset="./images/optimized/benetech_white-360.webp 360w, ./images/optimized/benetech_white-720.webp 720w" data-dark-preview-src="./images/optimized/benetech_white-1200.webp" data-dark-fallback-src="./images/benetech_white.png" data-dark-fallback-preview-src="./images/benetech_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" sizes="(max-width: 767px) calc((100vw - 2.5rem) / 2), 292px" loading="lazy" decoding="async" fetchpriority="low" width="2748" height="746" alt="Product screenshot 06" />
-                                        </a>
-                                        <a data-showcase-card href="https://www.kaggle.com/competitions/happy-whale-and-dolphin/writeups/aillis-jp-yujiariyasu-6th-place-solution" target="_blank" rel="noopener noreferrer" aria-label="Open product screenshot 07 in a new window">
-                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/optimized/happy_whale_black-360.webp" data-light-srcset="./images/optimized/happy_whale_black-360.webp 360w, ./images/optimized/happy_whale_black-720.webp 720w" data-light-preview-src="./images/optimized/happy_whale_black-1200.webp" data-light-fallback-src="./images/happy_whale_black.png" data-light-fallback-preview-src="./images/happy_whale_black.png" data-dark-src="./images/optimized/happy_whale_white-360.webp" data-dark-srcset="./images/optimized/happy_whale_white-360.webp 360w, ./images/optimized/happy_whale_white-720.webp 720w" data-dark-preview-src="./images/optimized/happy_whale_white-1200.webp" data-dark-fallback-src="./images/happy_whale_white.png" data-dark-fallback-preview-src="./images/happy_whale_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" sizes="(max-width: 767px) calc((100vw - 2.5rem) / 2), 292px" loading="lazy" decoding="async" fetchpriority="low" width="2748" height="746" alt="Product screenshot 07" />
-                                        </a>
-                                        <a data-showcase-card href="https://www.kaggle.com/competitions/rsna-str-pulmonary-embolism-detection/writeups/aillis-yuji-jan-yama-provisional-8th-place-solutio" target="_blank" rel="noopener noreferrer" aria-label="Open product screenshot 08 in a new window">
-                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/optimized/rsna_str_black-360.webp" data-light-srcset="./images/optimized/rsna_str_black-360.webp 360w, ./images/optimized/rsna_str_black-720.webp 720w" data-light-preview-src="./images/optimized/rsna_str_black-1200.webp" data-light-fallback-src="./images/rsna_str_black.png" data-light-fallback-preview-src="./images/rsna_str_black.png" data-dark-src="./images/optimized/rsna_str_white-360.webp" data-dark-srcset="./images/optimized/rsna_str_white-360.webp 360w, ./images/optimized/rsna_str_white-720.webp 720w" data-dark-preview-src="./images/optimized/rsna_str_white-1200.webp" data-dark-fallback-src="./images/rsna_str_white.png" data-dark-fallback-preview-src="./images/rsna_str_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" sizes="(max-width: 767px) calc((100vw - 2.5rem) / 2), 292px" loading="lazy" decoding="async" fetchpriority="low" width="2774" height="746" alt="Product screenshot 08" />
-                                        </a>
-                                    </div>
-                                    <script>
-                                        (function () {
-                                            const showcaseImages = document.querySelectorAll('#article-showcase [data-showcase-image]');
-                                            const isDarkMode = document.documentElement.classList.contains('dark');
-
-                                            showcaseImages.forEach((image) => {
-                                                window.__PI_BIND_IMAGE_FALLBACK(image);
-                                                window.__PI_APPLY_THEME_SOURCE(image, isDarkMode);
-                                            });
-                                        }());
-                                    </script>
-                                </section>
-
-                                <!-- <section>
-                                    <h2 class="font-inter-tight text-lg font-semibold text-gray-800 dark:text-gray-100 mb-6">About</h2> -->
-                                    <!-- <div class="p-5 rounded-xl bg-linear-to-tr from-gray-100 to-gray-50 dark:bg-linear-to-tr dark:from-gray-800 dark:to-gray-800/[0.65]">
-                                        <p class="text-sm text-gray-600 dark:text-gray-400">
-                                          Pattern Intelligence Inc.
-                                          AI / Machine Learning development
-                                          Computer vision and data analysis.
-                                        </p>
-                                    </div> -->
-                                <!-- </section> -->
+                                <h2 class="font-inter-tight text-lg font-semibold text-gray-800 dark:text-gray-100 mb-6">About</h2>
+                                <div class="p-5 rounded-xl bg-linear-to-tr from-gray-100 to-gray-50 dark:bg-linear-to-tr dark:from-gray-800 dark:to-gray-800/[0.65]">
+                                
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                                  Pattern Intelligence delivers production-ready computer vision systems for performance-critical applications.
+                                </p>
+                                
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                                Founder<br>
+                                Yuji Ariyasu — Kaggle Grandmaster
+                                </p>
+                                
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                Contact<br>
+                                info@patternint.com
+                                </p>
+                                
+                                </div>
+                              </section>
+      
+                                <!-- Experience -->
                                 <section>
-                                  <h2 class="font-inter-tight text-lg font-semibold text-gray-800 dark:text-gray-100 mb-6">About</h2>
-                                  <div class="p-5 rounded-xl bg-linear-to-tr from-gray-100 to-gray-50 dark:bg-linear-to-tr dark:from-gray-800 dark:to-gray-800/[0.65]">
-                                  
-                                  <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                                    Pattern Intelligence Inc. develops AI and machine learning technologies focused on computer vision and data analysis.
-                                  </p>
-                                  
-                                  <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                                  Founder<br>
-                                  Yuji Ariyasu — Kaggle Grandmaster
-                                  </p>
-                                  
-                                  <p class="text-sm text-gray-600 dark:text-gray-400">
-                                  Contact<br>
-                                  patternintelligence@gmail.com
-                                  </p>
-                                  
-                                  </div>
-                                  </section>
-
-                                <!-- Articles section removed per request. -->
-        
-                                <!-- Newsletter -->
-                                <!-- <section>
-                                    <h2 class="font-inter-tight text-lg font-semibold text-gray-800 dark:text-gray-100 mb-6">Let's Connect</h2>
-                                    <div class="p-5 rounded-xl bg-linear-to-tr from-gray-100 to-gray-50 dark:bg-linear-to-tr dark:from-gray-800 dark:to-gray-800/[0.65]">
-                                        <form>
-                                            <div class="flex bg-white dark:bg-gray-900 p-2 rounded-lg focus-within:ring-2 ring-gray-300 dark:ring-gray-600">
-                                                <input class="flex-1 text-sm bg-transparent text-gray-800 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-600 border-none focus:ring-0 focus:outline-hidden" type="email" name="email" aria-label="Enter your email to subscribe my newsletter" placeholder="Enter your email..." autocomplete="off" />
-                                                <button class="btn-sm text-gray-200 dark:text-gray-800 bg-linear-to-r from-gray-800 to-gray-700 dark:from-gray-300 dark:to-gray-100 dark:hover:bg-gray-100 shadow-sm relative before:absolute before:inset-0 before:rounded-[inherit] before:bg-linear-[45deg,transparent_25%,var(--color-white)_50%,transparent_75%,transparent_100%] before:opacity-20 dark:before:opacity-100 dark:before:bg-linear-[45deg,transparent_25%,var(--color-white)_50%,transparent_75%,transparent_100%] before:bg-[length:250%_250%,100%_100%] before:bg-[position:200%_0,0_0] before:bg-no-repeat before:[transition:background-position_0s_ease] hover:before:bg-[position:-100%_0,0_0] hover:before:duration-1500">Join Newsletter</button>
+                                    <h2 class="font-inter-tight text-lg font-semibold text-gray-800 dark:text-gray-100 mb-6">Experience</h2>
+                                    <div class="space-y-1">
+                                        <!-- Post #1 -->
+                                        <article class="p-5 rounded-xl odd:bg-linear-to-tr odd:from-gray-100 odd:to-gray-50 dark:odd:bg-linear-to-tr dark:odd:from-gray-800 dark:odd:to-gray-800/[0.65]">
+                                            <div class="sm:flex gap-5">
+                                                <div class="shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600/[0.65] shadow-xs max-sm:mb-3 sm:mt-5">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                                                        <path fill="#9C76EC" d="M7.567 7.6c-1.814-.137-3.56-.885-4.874-2.204A7.662 7.662 0 0 1 .5.5c1.868.136 3.56.884 4.874 2.203A7.662 7.662 0 0 1 7.567 7.6Zm.865 0c1.814-.137 3.56-.885 4.873-2.204C14.62 4.076 15.364 2.322 15.5.5c-1.869.136-3.629.884-4.874 2.203A7.662 7.662 0 0 0 8.432 7.6Zm4.873 3.005c-1.313-1.32-3.06-2.068-4.873-2.204a7.662 7.662 0 0 0 2.193 4.896c1.313 1.32 3.06 2.067 4.874 2.204-.136-1.877-.88-3.645-2.194-4.896ZM7.636 8.4c-1.882.136-3.629.884-4.942 2.204C1.38 11.854.622 13.623.5 15.5c1.868-.123 3.56-.884 4.942-2.204a7.662 7.662 0 0 0 2.193-4.896Z" />
+                                                    </svg>
+                                                </div>
+                                                <div>
+                                                    <div class="space-y-1.5 mb-3">
+                                                        <div class="text-[13px] italic text-gray-500/70">2021 - Today</div>
+                                                        <h3 class="font-semibold text-gray-800 dark:text-gray-100">
+                                                            <a class="hover:underline decoration-2 decoration-gray-300 dark:decoration-gray-600 underline-offset-2" href="#0">Senior Developer and VP of Product at Qonto</a>
+                                                        </h3>
+                                                        <div class="text-[13px] font-medium text-gray-600dark:text-gray-400">London, UK</div>
+                                                    </div>
+                                                    <p class="text-sm text-gray-600 dark:text-gray-400">Setting vision, leadership, processes while directly participating in communications with clients such as eBay, Amazon, X, Twitch, Instagram, and many others.</p>
+                                                </div>
                                             </div>
-                                        </form>
+                                        </article>
+                                        <!-- Post #2 -->
+                                        <article class="p-5 rounded-xl odd:bg-linear-to-tr odd:from-gray-100 odd:to-gray-50 dark:odd:bg-linear-to-tr dark:odd:from-gray-800 dark:odd:to-gray-800/[0.65]">
+                                            <div class="sm:flex gap-5">
+                                                <div class="shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600/[0.65] shadow-xs max-sm:mb-3 sm:mt-5">
+                                                    <svg class="fill-gray-700 dark:fill-gray-100" xmlns="http://www.w3.org/2000/svg" width="18" height="11">
+                                                        <path d="M5.077 0c2.803 0 5.076 2.418 5.076 5.4s-2.273 5.4-5.076 5.4C2.273 10.8 0 8.382 0 5.4S2.273 0 5.077 0Zm8.106.316c1.402 0 2.538 2.276 2.538 5.084 0 2.807-1.136 5.084-2.538 5.084S10.645 8.207 10.645 5.4c0-2.807 1.136-5.084 2.538-5.084ZM18 5.4c0-2.515-.4-4.554-.893-4.554-.492 0-.892 2.04-.892 4.554 0 2.515.4 4.555.892 4.555.494 0 .893-2.04.893-4.555Z" />
+                                                    </svg>
+                                                </div>
+                                                <div>
+                                                    <div class="space-y-1.5 mb-3">
+                                                        <div class="text-[13px] italic text-gray-500/70">2019 - 2021</div>
+                                                        <h3 class="font-semibold text-gray-800 dark:text-gray-100">
+                                                            <a class="hover:underline decoration-2 decoration-gray-300 dark:decoration-gray-600 underline-offset-2" href="#0">Fullstack Developer at Medium Inc.</a>
+                                                        </h3>
+                                                        <div class="text-[13px] font-medium text-gray-600dark:text-gray-400">New York, NYC</div>
+                                                    </div>
+                                                    <p class="text-sm text-gray-600 dark:text-gray-400">Setting vision, leadership, processes while directly participating in communications with clients such as eBay, Amazon, X, Twitch, Instagram, and many others.</p>
+                                                </div>
+                                            </div>
+                                        </article>
+                                        <!-- Post #3 -->
+                                        <article class="p-5 rounded-xl odd:bg-linear-to-tr odd:from-gray-100 odd:to-gray-50 dark:odd:bg-linear-to-tr dark:odd:from-gray-800 dark:odd:to-gray-800/[0.65]">
+                                            <div class="sm:flex gap-5">
+                                                <div class="shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600/[0.65] shadow-xs max-sm:mb-3 sm:mt-5">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="16">
+                                                        <path fill="#00ADEF" d="M17.995 3.602c-.075 1.725-1.274 4.124-3.674 7.198-2.474 3.15-4.499 4.799-6.223 4.799-1.05 0-1.95-.975-2.7-2.924-.45-1.8-.974-3.524-1.424-5.324-.525-1.95-1.125-2.924-1.725-2.924-.15 0-.6.3-1.424.825L0 4.202c.9-.75 1.8-1.575 2.624-2.325 1.2-1.05 2.1-1.574 2.7-1.65 1.424-.15 2.249.826 2.549 2.85.375 2.175.6 3.6.75 4.124.375 1.8.825 2.774 1.35 2.774.374 0 .974-.6 1.724-1.8.75-1.199 1.125-2.099 1.2-2.698.075-1.05-.3-1.575-1.2-1.575-.45 0-.9.075-1.35.3.9-2.924 2.55-4.274 5.099-4.199 1.8.075 2.624 1.275 2.55 3.599Z" />
+                                                    </svg>
+                                                </div>
+                                                <div>
+                                                    <div class="space-y-1.5 mb-3">
+                                                        <div class="text-[13px] italic text-gray-500/70">2017 - 2019</div>
+                                                        <h3 class="font-semibold text-gray-800 dark:text-gray-100">
+                                                            <a class="hover:underline decoration-2 decoration-gray-300 dark:decoration-gray-600 underline-offset-2" href="#0">System Engineer and Web Developer at Vimeo</a>
+                                                        </h3>
+                                                        <div class="text-[13px] font-medium text-gray-600dark:text-gray-400">London, UK</div>
+                                                    </div>
+                                                    <p class="text-sm text-gray-600 dark:text-gray-400">Setting vision, leadership, processes while directly participating in communications with clients such as eBay, Amazon, X, Twitch, Instagram, and many others.</p>
+                                                </div>
+                                            </div>
+                                        </article>
                                     </div>
                                 </section>
-         -->
+        
+        
                             </main>
         
                             <!-- Footer -->
                             <footer class="space-y-12 text-center pb-16">
-                                <!-- Initials logo -->
-                                <!-- <div>
-                                    <svg class="inline-flex fill-gray-800 dark:fill-gray-100" xmlns="http://www.w3.org/2000/svg" width="201" height="93">
-                                        <path d="M91.06.072c2.113 0 3.969.544 5.569 1.632 1.6 1.024 2.4 2.4 2.4 4.128 0 1.19-.213 2.38-.638 3.57a62.948 62.948 0 0 1 7.158-2.802c5.184-1.728 10.304-2.592 15.36-2.592.512.192 1.152.448 1.92.768.832.256 1.888.864 3.168 1.824 1.344.896 2.016 1.728 2.016 2.496s-.16 1.344-.48 1.728c-4.928 4.48-10.464 9.888-16.608 16.224-6.08 6.336-10.752 11.616-14.016 15.84l-6.912 9.024c-.384.576-.576 1.024-.576 1.344v.096l1.536-.768c.128-.064.224-.128.288-.192 23.36-16.448 39.008-28.096 46.944-34.944a.912.912 0 0 1 .768-.384c.32 0 .544.096.672.288.128.192.736.8 1.824 1.824 1.088.96 1.632 1.696 1.632 2.208 0 .448-.192.832-.576 1.152-6.336 6.016-12.8 13.568-19.392 22.656-6.592 9.088-9.888 16.096-9.888 21.024 0 .576.288.864.864.864 1.28 0 4.288-1.728 9.024-5.184 4.736-3.456 10.112-7.84 16.128-13.152 6.08-5.312 12.48-11.808 19.2-19.488 6.784-7.744 12.32-15.264 16.608-22.56a71.66 71.66 0 0 0 1.344-2.976c.32-.832.8-1.248 1.44-1.248.704 0 1.408.96 2.112 2.88.768 1.856 1.152 3.488 1.152 4.896 0 2.24-2.56 6.72-7.68 13.44-5.12 6.72-11.104 13.664-17.952 20.832-6.848 7.168-14.112 13.568-21.792 19.2-7.68 5.568-13.728 8.352-18.144 8.352-2.112 0-4.224-.832-6.336-2.496-2.048-1.664-3.072-4.352-3.072-8.064 0-4.608 1.376-9.344 4.128-14.208a24.086 24.086 0 0 1 3.936-5.184l2.208-2.592.384-.768v-.096c0-.128-.032-.192-.096-.192-.192 0-.48.192-.864.576-14.272 12.544-23.936 20.896-28.992 25.056-5.056 4.096-8.032 6.144-8.928 6.144-.896 0-1.632-.448-2.208-1.344a11.69 11.69 0 0 0-.864-.96c-.256-.384-.448-.64-.576-.768a3.146 3.146 0 0 0-.384-.48 2.86 2.86 0 0 0-.288-.384c-.064-.32-.096-.8-.096-1.44 0-.64.224-1.568.672-2.784.448-1.216.864-2.368 1.248-3.456.448-1.152 1.664-3.52 3.648-7.104 1.984-3.648 4.352-7.296 7.104-10.944 2.752-3.712 6.784-8.224 12.096-13.536 5.312-5.312 11.264-10.432 17.856-15.36 1.216-.96 1.824-1.568 1.824-1.824s-.128-.384-.384-.384c-4.8 0-12.8 3.2-24 9.6l-.722.417c-2.646 4.308-6.147 9.737-10.502 16.287-8.128 12.224-15.264 21.888-21.408 28.992-.256.256-1.376 1.504-3.36 3.744a184.301 184.301 0 0 1-5.28 5.76c-1.536 1.664-3.68 3.712-6.432 6.144-2.688 2.432-5.216 4.448-7.584 6.048-2.304 1.664-4.896 3.072-7.776 4.224-2.944 1.216-5.696 1.824-8.256 1.824-4.032 0-6.048-1.408-6.048-4.224 0-3.136 1.888-6.72 5.664-10.752 3.712-3.968 8-7.328 12.864-10.08 4.8-2.752 8.768-4.128 11.904-4.128.384 0 .576.16.576.48 0 .32-.128.576-.384.768-.256.192-1.056.608-2.4 1.248-3.776 1.92-8.544 5.728-14.304 11.424-5.824 5.696-8.736 9.6-8.736 11.712 0 .256.128.384.384.384 2.688 0 8.48-4.736 17.376-14.208C47.7 65.992 55.06 57.64 61.205 50.088A4287.35 4287.35 0 0 0 78.558 29c-2.586 2.12-4.405 4.029-5.457 5.728-.192.576-.48.864-.864.864s-.576-.48-.576-1.44.832-2.656 2.496-5.088c1.664-2.496 4.064-5.152 7.2-7.968 2.852-2.567 5.984-5.007 9.395-7.32 1.91-2.522 3.037-4.178 3.38-4.968.577-.768.865-1.312.865-1.632 0-.384-.16-.576-.48-.576-4.096 0-8.992 1.632-14.688 4.896A88.464 88.464 0 0 0 64.277 22.92c-4.672 4.288-8.672 8.576-12 12.864-3.328 4.224-4.992 7.328-4.992 9.312 0 .256.096.384.288.384 2.048 0 9.216-5.184 21.504-15.552 1.216-1.28 1.984-1.92 2.304-1.92.32 0 .48.128.48.384 0 .192-.416.896-1.248 2.112C60.5 45.16 52.597 52.488 46.9 52.488c-2.048 0-3.68-.832-4.896-2.496-1.152-1.728-1.728-4-1.728-6.816 0-2.88 1.472-6.752 4.416-11.616 3.008-4.864 6.816-9.632 11.424-14.304 4.608-4.672 10.08-8.704 16.416-12.096C78.933 1.768 85.109.072 91.06.072Zm95.063 41.76-10.848-.192c-1.088 0-1.696.064-1.824.192l-.96 5.472c0 .64.064 1.056.192 1.248.128.128.384.192.768.192.448 0 .928-.096 1.44-.288 2.368.064 10.304.224 23.808.48 1.344-.32 2.016-1.248 2.016-2.784 0-.64-.256-1.28-.768-1.92-1.024-1.984-2.432-2.976-4.224-2.976-.448 0-.896.096-1.344.288-2.688.192-5.44.288-8.256.288Zm-171.716 0L3.559 41.64c-1.088 0-1.696.064-1.824.192l-.96 5.472c0 .64.064 1.056.192 1.248.128.128.384.192.768.192.448 0 .928-.096 1.44-.288 2.368.064 10.304.224 23.808.48 1.344-.32 2.016-1.248 2.016-2.784 0-.64-.256-1.28-.768-1.92-1.024-1.984-2.432-2.976-4.224-2.976-.448 0-.896.096-1.344.288-2.688.192-5.44.288-8.256.288Z" />
-                                    </svg>
-                                </div> -->
                                 <div class="space-y-6">
                                     <!-- Social icons -->
                                     <ul class="inline-flex gap-4">
-                                        <li>
-                                            <a class="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600/[0.65] shadow-xs text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100 transition-colors" href="https://x.com/aryyyyy221" target="_blank" rel="noopener noreferrer" aria-label="X">
-                                                <svg class="fill-current" xmlns="http://www.w3.org/2000/svg" width="16" height="14">
-                                                    <path d="M16 14h-4.938L7.197 9.108 2.771 14H.316l5.736-6.342L0 0h5.063l3.496 4.476L12.601 0h2.454L9.697 5.932 16 14Zm-4.26-1.422h1.36L4.323 1.347H2.865l8.875 11.231Z" />
-                                                </svg>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600/[0.65] shadow-xs text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100 transition-colors" href="https://github.com/yujiariyasu" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
-                                                <svg class="fill-current" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
-                                                    <path d="M7.95 0C3.578 0 0 3.578 0 7.95c0 3.479 2.286 6.46 5.466 7.553.397.1.497-.199.497-.397v-1.392c-2.187.497-2.683-.994-2.683-.994-.398-.894-.895-1.192-.895-1.192-.696-.497.1-.497.1-.497.795.1 1.192.795 1.192.795.696 1.292 1.888.894 2.286.696.1-.497.298-.895.497-1.093-1.79-.2-3.578-.895-3.578-3.976 0-.894.298-1.59.795-2.087-.1-.198-.397-.993.1-2.086 0 0 .695-.2 2.186.795a6.408 6.408 0 0 1 1.987-.299c.696 0 1.392.1 1.988.299 1.49-.994 2.186-.796 2.186-.796.398 1.094.199 1.889.1 2.087.496.597.795 1.292.795 2.087 0 3.081-1.889 3.677-3.677 3.876.298.398.596.895.596 1.59v2.187c0 .198.1.496.596.397C13.714 14.41 16 11.43 16 7.95 15.9 3.578 12.323 0 7.95 0Z" />
-                                                </svg>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600/[0.65] shadow-xs text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100 transition-colors" href="https://www.facebook.com/yuji.ariyasu?locale=ja_JP" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-                                                <svg class="fill-current" xmlns="http://www.w3.org/2000/svg" width="10" height="15">
-                                                    <path d="m2.834 15-.022-6.563H0V5.626h2.813V3.75C2.813 1.22 4.38 0 6.636 0c1.081 0 2.01.08 2.281.116v2.645H7.353c-1.228 0-1.466.584-1.466 1.44v1.424h3.488l-.938 2.813h-2.55V15H2.834Z" />
-                                                </svg>
-                                            </a>
-                                        </li>
+                                      <li>
+                                        <a class="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600/[0.65] shadow-xs text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
+                                           href="https://x.com/aryyyyy221"
+                                           aria-label="X"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            <svg class="fill-current" xmlns="http://www.w3.org/2000/svg" width="16" height="14">
+                                                <path d="M16 14h-4.938L7.197 9.108 2.771 14H.316l5.736-6.342L0 0h5.063l3.496 4.476L12.601 0h2.454L9.697 5.932 16 14Zm-4.26-1.422h1.36L4.323 1.347H2.865l8.875 11.231Z"/>
+                                            </svg>
+                                        </a>
+                                      </li>
+                                      
+                                      <li>
+                                        <a class="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600/[0.65] shadow-xs text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
+                                           href="https://github.com/yujiariyasu"
+                                           aria-label="GitHub"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            <svg class="fill-current" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                                                <path d="M7.95 0C3.578 0 0 3.578 0 7.95c0 3.479 2.286 6.46 5.466 7.553.397.1.497-.199.497-.397v-1.392c-2.187.497-2.683-.994-2.683-.994-.398-.894-.895-1.192-.895-1.192-.696-.497.1-.497.1-.497.795.1 1.192.795 1.192.795.696 1.292 1.888.894 2.286.696.1-.497.298-.895.497-1.093-1.79-.2-3.578-.895-3.578-3.976 0-.894.298-1.59.795-2.087-.1-.198-.397-.993.1-2.086 0 0 .695-.2 2.186.795a6.408 6.408 0 0 1 1.987-.299c.696 0 1.392.1 1.988.299 1.49-.994 2.186-.796 2.186-.796.398 1.094.199 1.889.1 2.087.496.597.795 1.292.795 2.087 0 3.081-1.889 3.677-3.677 3.876.298.398.596.895.596 1.59v2.187c0 .198.1.496.596.397C13.714 14.41 16 11.43 16 7.95 15.9 3.578 12.323 0 7.95 0Z"/>
+                                            </svg>
+                                        </a>
+                                      </li>
+                                      
+                                      <li>
+                                        <a class="w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600/[0.65] shadow-xs text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
+                                           href="https://www.linkedin.com/in/yuji-ariyasu-444249196/"
+                                           aria-label="LinkedIn"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            <svg class="fill-current" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                                                <path d="M14.82 0H1.18C.53 0 0 .52 0 1.16v13.68C0 15.48.53 16 1.18 16h13.64c.65 0 1.18-.52 1.18-1.16V1.16C16 .52 15.47 0 14.82 0zM4.75 13.5H2.37V6h2.38v7.5zM3.56 5.04c-.76 0-1.37-.61-1.37-1.36S2.8 2.32 3.56 2.32c.75 0 1.36.61 1.36 1.36S4.31 5.04 3.56 5.04zM13.63 13.5h-2.37V9.83c0-.87-.02-2-1.22-2-1.23 0-1.42.96-1.42 1.94v3.73H6.25V6h2.28v1.03h.03c.32-.6 1.1-1.23 2.27-1.23 2.43 0 2.88 1.6 2.88 3.68v4.02z"/>
+                                            </svg>
+                                        </a>
+                                      </li>                                      
                                     </ul>
                                     <!-- Copyright notes -->
                                     <p class="text-sm text-gray-400 dark:text-gray-600">&copy; Pattern Intelligence Inc. All rights reserved.</p>
@@ -397,249 +223,8 @@
             </div>
         </div>
 
-        <div id="showcase-overlay" aria-hidden="true">
-            <a id="showcase-overlay-link" href="#" target="_blank" rel="noopener noreferrer" aria-label="Open preview in a new window">
-                <img id="showcase-overlay-image" src="" alt="" decoding="async" />
-            </a>
-        </div>
-
         <script src="./js/vendors/alpinejs.min.js" defer></script>
         <script src="./js/main.js"></script>
-        <script>
-            (function () {
-                const showcase = document.getElementById('article-showcase');
-                const overlay = document.getElementById('showcase-overlay');
-                const overlayLink = document.getElementById('showcase-overlay-link');
-                const overlayImage = document.getElementById('showcase-overlay-image');
-                const lightSwitch = document.getElementById('light-switch');
-
-                if (!showcase || !overlay || !overlayLink || !overlayImage) {
-                    return;
-                }
-
-                const cards = Array.from(showcase.querySelectorAll('[data-showcase-card]'));
-                const showcaseImages = cards
-                    .map((card) => card.querySelector('[data-showcase-image]'))
-                    .filter(Boolean);
-                const overlayWidthRatio = 0.52;
-                const overlayMaxWidth = 780;
-                const overlayHeightRatio = 0.50;
-                let activeCard = null;
-
-                showcaseImages.forEach((image) => {
-                    window.__PI_BIND_IMAGE_FALLBACK(image);
-                });
-
-                overlayImage.addEventListener('error', () => {
-                    const fallbackSrc = overlayImage.dataset.fallbackSrc;
-
-                    if (fallbackSrc && overlayImage.getAttribute('src') !== fallbackSrc) {
-                        overlayImage.setAttribute('src', fallbackSrc);
-                    }
-                });
-
-                const getInteractiveCard = () => {
-                    const hoveredCard = cards.find((card) => card.matches(':hover'));
-
-                    if (hoveredCard) {
-                        return hoveredCard;
-                    }
-
-                    return cards.find((card) => card.matches(':focus-within')) || null;
-                };
-
-                const getHitTarget = (x, y) => document.elementFromPoint(x, y);
-                const isPointWithinRect = (x, y, rect) => (
-                    x >= rect.left
-                    && x <= rect.right
-                    && y >= rect.top
-                    && y <= rect.bottom
-                );
-                const isPointerInsideOverlayImage = (x, y) => {
-                    if (!overlay.classList.contains('is-visible')) {
-                        return false;
-                    }
-
-                    return isPointWithinRect(x, y, overlayImage.getBoundingClientRect());
-                };
-
-                const getOverlayDimensions = (image) => {
-                    const naturalWidth = image.naturalWidth || Number(image.getAttribute('width')) || image.clientWidth || 1;
-                    const naturalHeight = image.naturalHeight || Number(image.getAttribute('height')) || image.clientHeight || 1;
-                    const aspectRatio = naturalWidth / naturalHeight;
-                    let width = Math.min(window.innerWidth * overlayWidthRatio, overlayMaxWidth);
-                    let height = width / aspectRatio;
-                    const maxHeight = window.innerHeight * overlayHeightRatio;
-
-                    if (height > maxHeight) {
-                        height = maxHeight;
-                        width = height * aspectRatio;
-                    }
-
-                    return { width, height };
-                };
-
-                const applyPreviewState = (card) => {
-                    cards.forEach((item) => {
-                        item.classList.toggle('is-source', item === card);
-                    });
-
-                    if (!card) {
-                        activeCard = null;
-                        overlay.classList.remove('is-visible');
-                        overlay.setAttribute('aria-hidden', 'true');
-                        showcase.classList.remove('has-active');
-                        overlay.style.setProperty('--overlay-offset-x', '0px');
-                        overlay.style.setProperty('--overlay-offset-y', '0px');
-                        overlay.style.setProperty('--overlay-start-scale', '0.86');
-                        overlayLink.href = '#';
-                        return;
-                    }
-
-                    const image = card.querySelector('[data-showcase-image]');
-
-                    if (!image) {
-                        return;
-                    }
-
-                    const rect = image.getBoundingClientRect();
-                    const viewportCenterX = window.innerWidth / 2;
-                    const viewportCenterY = window.innerHeight / 2;
-                    const imageCenterX = rect.left + rect.width / 2;
-                    const imageCenterY = rect.top + rect.height / 2;
-                    const offsetX = Math.round(imageCenterX - viewportCenterX);
-                    const offsetY = Math.round(imageCenterY - viewportCenterY);
-                    const overlayDimensions = getOverlayDimensions(image);
-                    const startScale = Math.min(rect.width / overlayDimensions.width, rect.height / overlayDimensions.height);
-
-                    activeCard = card;
-                    overlay.style.setProperty('--overlay-offset-x', `${offsetX}px`);
-                    overlay.style.setProperty('--overlay-offset-y', `${offsetY}px`);
-                    overlay.style.setProperty('--overlay-start-scale', `${startScale}`);
-                    overlayLink.href = card.href;
-                    overlayImage.dataset.fallbackSrc = image.dataset.fallbackPreviewSrc || image.dataset.fallbackSrc || image.currentSrc || image.src;
-                    overlayImage.src = image.dataset.previewSrc || image.currentSrc || image.src;
-                    overlayImage.alt = image.alt;
-                    overlay.classList.add('is-visible');
-                    overlay.setAttribute('aria-hidden', 'false');
-                    showcase.classList.add('has-active');
-                };
-
-                const showPreview = (card) => {
-                    applyPreviewState(card);
-                };
-
-                const hidePreview = () => {
-                    applyPreviewState(null);
-                };
-
-                const syncThemeImages = () => {
-                    const isDarkMode = document.documentElement.classList.contains('dark');
-
-                    showcaseImages.forEach((image) => {
-                        window.__PI_APPLY_THEME_SOURCE(image, isDarkMode);
-                    });
-
-                    if (activeCard) {
-                        applyPreviewState(activeCard);
-                    }
-                };
-
-                const syncPreviewFromFocus = () => {
-                    const interactiveCard = getInteractiveCard();
-
-                    if (interactiveCard) {
-                        showPreview(interactiveCard);
-                        return;
-                    }
-
-                    if (!overlayLink.matches(':focus-within')) {
-                        hidePreview();
-                    }
-                };
-
-                const syncPreviewFromPointer = (x, y) => {
-                    const hitTarget = getHitTarget(x, y);
-
-                    if (!hitTarget) {
-                        hidePreview();
-                        return;
-                    }
-
-                    if (isPointerInsideOverlayImage(x, y)) {
-                        return;
-                    }
-
-                    const pointedCard = cards.find((card) => card.contains(hitTarget)) || null;
-
-                    if (pointedCard) {
-                        showPreview(pointedCard);
-                        return;
-                    }
-
-                    if (!getInteractiveCard() && !overlayLink.matches(':focus-within')) {
-                        hidePreview();
-                    }
-                };
-
-                cards.forEach((card) => {
-                    card.addEventListener('mouseenter', () => showPreview(card));
-                    card.addEventListener('focusin', () => showPreview(card));
-                    card.addEventListener('focusout', () => {
-                        requestAnimationFrame(syncPreviewFromFocus);
-                    });
-                });
-
-                document.addEventListener('pointermove', (event) => {
-                    syncPreviewFromPointer(event.clientX, event.clientY);
-                });
-
-                overlayLink.addEventListener('focusin', () => {
-                    if (activeCard) {
-                        showPreview(activeCard);
-                    }
-                });
-                overlayLink.addEventListener('focusout', () => {
-                    requestAnimationFrame(syncPreviewFromFocus);
-                });
-                overlayLink.addEventListener('pointerleave', (event) => {
-                    requestAnimationFrame(() => {
-                        syncPreviewFromPointer(event.clientX, event.clientY);
-                    });
-                });
-
-                if (lightSwitch) {
-                    lightSwitch.addEventListener('change', () => {
-                        requestAnimationFrame(syncThemeImages);
-                    });
-                }
-
-                const themeObserver = new MutationObserver(() => {
-                    syncThemeImages();
-                });
-
-                themeObserver.observe(document.documentElement, {
-                    attributes: true,
-                    attributeFilter: ['class'],
-                });
-
-                document.addEventListener('visibilitychange', () => {
-                    if (document.hidden) {
-                        hidePreview();
-                    }
-                });
-
-                document.addEventListener('pointerleave', hidePreview);
-                window.addEventListener('blur', hidePreview);
-                window.addEventListener('pointerdown', (event) => {
-                    if (!showcase.contains(event.target) && !overlayLink.contains(event.target)) {
-                        hidePreview();
-                    }
-                });
-
-                syncThemeImages();
-            }());
-        </script>
 
     </body>
 
