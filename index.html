@@ -108,21 +108,111 @@
                     localStorage.getItem('dark-mode') === 'false'
                     || !('dark-mode' in localStorage)
                 );
+                const gridImageSizes = '(max-width: 767px) calc((100vw - 2.5rem) / 2), 292px';
 
                 document.documentElement.classList.toggle('dark', isDarkMode);
                 window.__PI_DARK_MODE = isDarkMode;
-                window.__PI_THEME_SUFFIX = isDarkMode ? '_white' : '_black';
+                window.__PI_GRID_IMAGE_SIZES = gridImageSizes;
 
-                [
-                    './images/user-image.png',
-                    `./images/rsna_2024${window.__PI_THEME_SUFFIX}.png`,
-                    `./images/hms${window.__PI_THEME_SUFFIX}.png`
-                ].forEach((href) => {
+                window.__PI_GET_THEME_SOURCE_CONFIG = function (image, isDarkMode) {
+                    const prefix = isDarkMode ? 'dark' : 'light';
+                    const read = (suffix) => image.dataset[`${prefix}${suffix}`];
+
+                    return {
+                        src: read('Src'),
+                        srcset: read('Srcset'),
+                        previewSrc: read('PreviewSrc'),
+                        fallbackSrc: read('FallbackSrc'),
+                        fallbackPreviewSrc: read('FallbackPreviewSrc') || read('FallbackSrc'),
+                    };
+                };
+
+                window.__PI_BIND_IMAGE_FALLBACK = function (image) {
+                    if (!image || image.dataset.fallbackBound === 'true') {
+                        return;
+                    }
+
+                    image.dataset.fallbackBound = 'true';
+                    image.addEventListener('error', () => {
+                        const fallbackSrc = image.dataset.fallbackSrc;
+
+                        if (!fallbackSrc || image.dataset.usingFallback === 'true') {
+                            return;
+                        }
+
+                        image.dataset.usingFallback = 'true';
+                        image.removeAttribute('srcset');
+                        image.setAttribute('src', fallbackSrc);
+                        image.dataset.previewSrc = image.dataset.fallbackPreviewSrc || fallbackSrc;
+                    });
+                };
+
+                window.__PI_APPLY_THEME_SOURCE = function (image, isDarkMode) {
+                    const config = window.__PI_GET_THEME_SOURCE_CONFIG(image, isDarkMode);
+
+                    if (!config || !config.src) {
+                        return;
+                    }
+
+                    image.dataset.usingFallback = 'false';
+                    image.dataset.fallbackSrc = config.fallbackSrc || '';
+                    image.dataset.fallbackPreviewSrc = config.fallbackPreviewSrc || config.fallbackSrc || config.src;
+                    image.dataset.previewSrc = config.previewSrc || image.dataset.fallbackPreviewSrc || config.src;
+
+                    if (config.srcset) {
+                        image.setAttribute('srcset', config.srcset);
+                    } else {
+                        image.removeAttribute('srcset');
+                    }
+
+                    image.setAttribute('sizes', window.__PI_GRID_IMAGE_SIZES);
+
+                    if (image.getAttribute('src') !== config.src) {
+                        image.setAttribute('src', config.src);
+                    }
+                };
+
+                const addImagePreload = ({ href, srcset, sizes }) => {
                     const preload = document.createElement('link');
                     preload.rel = 'preload';
                     preload.as = 'image';
                     preload.href = href;
+
+                    if (srcset) {
+                        preload.setAttribute('imagesrcset', srcset);
+                    }
+
+                    if (sizes) {
+                        preload.setAttribute('imagesizes', sizes);
+                    }
+
                     document.head.appendChild(preload);
+                };
+
+                const themeStem = isDarkMode ? 'white' : 'black';
+
+                addImagePreload({
+                    href: './images/optimized/user-image-48.webp',
+                    srcset: [
+                        './images/optimized/user-image-48.webp 48w',
+                        './images/optimized/user-image-96.webp 96w',
+                        './images/optimized/user-image-192.webp 192w',
+                    ].join(', '),
+                    sizes: '48px',
+                });
+
+                [
+                    'rsna_2024',
+                    'hms',
+                ].forEach((baseName) => {
+                    addImagePreload({
+                        href: `./images/optimized/${baseName}_${themeStem}-360.webp`,
+                        srcset: [
+                            `./images/optimized/${baseName}_${themeStem}-360.webp 360w`,
+                            `./images/optimized/${baseName}_${themeStem}-720.webp 720w`,
+                        ].join(', '),
+                        sizes: gridImageSizes,
+                    });
                 });
             }());
         </script>
@@ -161,10 +251,10 @@
                                 </div>
                                 <!-- Intro -->
                                 <div class="mb-10">
-                                    <img class="inline-flex rounded-full shadow-lg mb-4" src="./images/user-image.png" width="48" height="48" alt="Pattern Intelligence Inc." loading="eager" decoding="async" fetchpriority="high" />
+                                    <img class="inline-flex rounded-full shadow-lg mb-4" src="./images/optimized/user-image-48.webp" srcset="./images/optimized/user-image-48.webp 48w, ./images/optimized/user-image-96.webp 96w, ./images/optimized/user-image-192.webp 192w" sizes="48px" width="48" height="48" alt="Pattern Intelligence Inc." loading="eager" decoding="async" fetchpriority="high" onerror="this.onerror=null;this.removeAttribute('srcset');this.src='./images/user-image.png';" />
                                     <div class="mb-5">
                                         <h1 class="font-inter-tight font-bold text-gray-800 dark:text-gray-100 text-2xl mb-1">Pattern Intelligence Inc.</h1>
-                                        <p class="text-sm text-gray-600 dark:text-gray-400">World-Class Computer Vision AI. Grandmasters Only.</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">AI for Computer Vision</p>
                                     </div>
                                     <!-- <a class="btn-sm text-gray-200 dark:text-gray-800 bg-linear-to-r from-gray-800 to-gray-700 dark:from-gray-300 dark:to-gray-100 dark:hover:bg-gray-100 shadow-sm relative before:absolute before:inset-0 before:rounded-[inherit] before:bg-linear-[45deg,transparent_25%,var(--color-white)_50%,transparent_75%,transparent_100%] before:opacity-20 dark:before:opacity-100 dark:before:bg-linear-[45deg,transparent_25%,var(--color-white)_50%,transparent_75%,transparent_100%] before:bg-[length:250%_250%,100%_100%] before:bg-[position:200%_0,0_0] before:bg-no-repeat before:[transition:background-position_0s_ease] hover:before:bg-[position:-100%_0,0_0] hover:before:duration-1500" href="#0">Available For Work</a> -->
                                 </div>
@@ -178,28 +268,28 @@
                                     <h2 class="font-inter-tight text-lg font-semibold text-gray-800 dark:text-gray-100 mb-6">Article</h2>
                                     <div id="article-showcase" class="mx-auto mt-8">
                                         <a data-showcase-card href="https://www.kaggle.com/competitions/rsna-2024-lumbar-spine-degenerative-classification/writeups/ianpan-kevin-yuji-bartley-2nd-place-solution#3012378" target="_blank" rel="noopener noreferrer" aria-label="Open product screenshot 01 in a new window">
-                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/rsna_2024_black.png" data-dark-src="./images/rsna_2024_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" loading="eager" decoding="async" fetchpriority="high" width="2748" height="746" alt="Product screenshot 01" />
+                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/optimized/rsna_2024_black-360.webp" data-light-srcset="./images/optimized/rsna_2024_black-360.webp 360w, ./images/optimized/rsna_2024_black-720.webp 720w" data-light-preview-src="./images/optimized/rsna_2024_black-1200.webp" data-light-fallback-src="./images/rsna_2024_black.png" data-light-fallback-preview-src="./images/rsna_2024_black.png" data-dark-src="./images/optimized/rsna_2024_white-360.webp" data-dark-srcset="./images/optimized/rsna_2024_white-360.webp 360w, ./images/optimized/rsna_2024_white-720.webp 720w" data-dark-preview-src="./images/optimized/rsna_2024_white-1200.webp" data-dark-fallback-src="./images/rsna_2024_white.png" data-dark-fallback-preview-src="./images/rsna_2024_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" sizes="(max-width: 767px) calc((100vw - 2.5rem) / 2), 292px" loading="eager" decoding="async" fetchpriority="high" width="2748" height="746" alt="Product screenshot 01" />
                                         </a>
                                         <a data-showcase-card href="https://www.kaggle.com/competitions/hms-harmful-brain-activity-classification/writeups/aillis-go-bilzard-4th-place-solution#2742639" target="_blank" rel="noopener noreferrer" aria-label="Open product screenshot 02 in a new window">
-                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/hms_black.png" data-dark-src="./images/hms_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" loading="eager" decoding="async" fetchpriority="high" width="2748" height="746" alt="Product screenshot 02" />
+                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/optimized/hms_black-360.webp" data-light-srcset="./images/optimized/hms_black-360.webp 360w, ./images/optimized/hms_black-720.webp 720w" data-light-preview-src="./images/optimized/hms_black-1200.webp" data-light-fallback-src="./images/hms_black.png" data-light-fallback-preview-src="./images/hms_black.png" data-dark-src="./images/optimized/hms_white-360.webp" data-dark-srcset="./images/optimized/hms_white-360.webp 360w, ./images/optimized/hms_white-720.webp 720w" data-dark-preview-src="./images/optimized/hms_white-1200.webp" data-dark-fallback-src="./images/hms_white.png" data-dark-fallback-preview-src="./images/hms_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" sizes="(max-width: 767px) calc((100vw - 2.5rem) / 2), 292px" loading="eager" decoding="async" fetchpriority="high" width="2748" height="746" alt="Product screenshot 02" />
                                         </a>
                                         <a data-showcase-card href="https://www.kaggle.com/competitions/siim-covid19-detection/writeups/aillis-yuji-ian-3rd-place-solution" target="_blank" rel="noopener noreferrer" aria-label="Open product screenshot 03 in a new window">
-                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/siim_rsna_black.png" data-dark-src="./images/siim_rsna_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" loading="lazy" decoding="async" fetchpriority="low" width="2748" height="746" alt="Product screenshot 03" />
+                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/optimized/siim_rsna_black-360.webp" data-light-srcset="./images/optimized/siim_rsna_black-360.webp 360w, ./images/optimized/siim_rsna_black-720.webp 720w" data-light-preview-src="./images/optimized/siim_rsna_black-1200.webp" data-light-fallback-src="./images/siim_rsna_black.png" data-light-fallback-preview-src="./images/siim_rsna_black.png" data-dark-src="./images/optimized/siim_rsna_white-360.webp" data-dark-srcset="./images/optimized/siim_rsna_white-360.webp 360w, ./images/optimized/siim_rsna_white-720.webp 720w" data-dark-preview-src="./images/optimized/siim_rsna_white-1200.webp" data-dark-fallback-src="./images/siim_rsna_white.png" data-dark-fallback-preview-src="./images/siim_rsna_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" sizes="(max-width: 767px) calc((100vw - 2.5rem) / 2), 292px" loading="lazy" decoding="async" fetchpriority="low" width="2748" height="746" alt="Product screenshot 03" />
                                         </a>
                                         <a data-showcase-card href="https://www.kaggle.com/competitions/rsna-2023-abdominal-trauma-detection/writeups/aillis-jp-yuji-ariyasu-3rd-place-solution" target="_blank" rel="noopener noreferrer" aria-label="Open product screenshot 04 in a new window">
-                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/rsna_2023_black.png" data-dark-src="./images/rsna_2023_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" loading="lazy" decoding="async" fetchpriority="low" width="2748" height="746" alt="Product screenshot 04" />
+                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/optimized/rsna_2023_black-360.webp" data-light-srcset="./images/optimized/rsna_2023_black-360.webp 360w, ./images/optimized/rsna_2023_black-720.webp 720w" data-light-preview-src="./images/optimized/rsna_2023_black-1200.webp" data-light-fallback-src="./images/rsna_2023_black.png" data-light-fallback-preview-src="./images/rsna_2023_black.png" data-dark-src="./images/optimized/rsna_2023_white-360.webp" data-dark-srcset="./images/optimized/rsna_2023_white-360.webp 360w, ./images/optimized/rsna_2023_white-720.webp 720w" data-dark-preview-src="./images/optimized/rsna_2023_white-1200.webp" data-dark-fallback-src="./images/rsna_2023_white.png" data-dark-fallback-preview-src="./images/rsna_2023_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" sizes="(max-width: 767px) calc((100vw - 2.5rem) / 2), 292px" loading="lazy" decoding="async" fetchpriority="low" width="2748" height="746" alt="Product screenshot 04" />
                                         </a>
                                         <a data-showcase-card href="https://www.kaggle.com/competitions/rsna-breast-cancer-detection/writeups/chiral-mistrals-6th-place-solution-multi-view-mult" target="_blank" rel="noopener noreferrer" aria-label="Open product screenshot 05 in a new window">
-                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/rsna_mammo_black.png" data-dark-src="./images/rsna_mammo_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" loading="lazy" decoding="async" fetchpriority="low" width="2748" height="746" alt="Product screenshot 05" />
+                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/optimized/rsna_mammo_black-360.webp" data-light-srcset="./images/optimized/rsna_mammo_black-360.webp 360w, ./images/optimized/rsna_mammo_black-720.webp 720w" data-light-preview-src="./images/optimized/rsna_mammo_black-1200.webp" data-light-fallback-src="./images/rsna_mammo_black.png" data-light-fallback-preview-src="./images/rsna_mammo_black.png" data-dark-src="./images/optimized/rsna_mammo_white-360.webp" data-dark-srcset="./images/optimized/rsna_mammo_white-360.webp 360w, ./images/optimized/rsna_mammo_white-720.webp 720w" data-dark-preview-src="./images/optimized/rsna_mammo_white-1200.webp" data-dark-fallback-src="./images/rsna_mammo_white.png" data-dark-fallback-preview-src="./images/rsna_mammo_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" sizes="(max-width: 767px) calc((100vw - 2.5rem) / 2), 292px" loading="lazy" decoding="async" fetchpriority="low" width="2748" height="746" alt="Product screenshot 05" />
                                         </a>
                                         <a data-showcase-card href="https://www.kaggle.com/competitions/benetech-making-graphs-accessible/discussion/418706" target="_blank" rel="noopener noreferrer" aria-label="Open product screenshot 06 in a new window">
-                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/benetech_black.png" data-dark-src="./images/benetech_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" loading="lazy" decoding="async" fetchpriority="low" width="2748" height="746" alt="Product screenshot 06" />
+                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/optimized/benetech_black-360.webp" data-light-srcset="./images/optimized/benetech_black-360.webp 360w, ./images/optimized/benetech_black-720.webp 720w" data-light-preview-src="./images/optimized/benetech_black-1200.webp" data-light-fallback-src="./images/benetech_black.png" data-light-fallback-preview-src="./images/benetech_black.png" data-dark-src="./images/optimized/benetech_white-360.webp" data-dark-srcset="./images/optimized/benetech_white-360.webp 360w, ./images/optimized/benetech_white-720.webp 720w" data-dark-preview-src="./images/optimized/benetech_white-1200.webp" data-dark-fallback-src="./images/benetech_white.png" data-dark-fallback-preview-src="./images/benetech_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" sizes="(max-width: 767px) calc((100vw - 2.5rem) / 2), 292px" loading="lazy" decoding="async" fetchpriority="low" width="2748" height="746" alt="Product screenshot 06" />
                                         </a>
                                         <a data-showcase-card href="https://www.kaggle.com/competitions/happy-whale-and-dolphin/writeups/aillis-jp-yujiariyasu-6th-place-solution" target="_blank" rel="noopener noreferrer" aria-label="Open product screenshot 07 in a new window">
-                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/happy_whale_black.png" data-dark-src="./images/happy_whale_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" loading="lazy" decoding="async" fetchpriority="low" width="2748" height="746" alt="Product screenshot 07" />
+                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/optimized/happy_whale_black-360.webp" data-light-srcset="./images/optimized/happy_whale_black-360.webp 360w, ./images/optimized/happy_whale_black-720.webp 720w" data-light-preview-src="./images/optimized/happy_whale_black-1200.webp" data-light-fallback-src="./images/happy_whale_black.png" data-light-fallback-preview-src="./images/happy_whale_black.png" data-dark-src="./images/optimized/happy_whale_white-360.webp" data-dark-srcset="./images/optimized/happy_whale_white-360.webp 360w, ./images/optimized/happy_whale_white-720.webp 720w" data-dark-preview-src="./images/optimized/happy_whale_white-1200.webp" data-dark-fallback-src="./images/happy_whale_white.png" data-dark-fallback-preview-src="./images/happy_whale_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" sizes="(max-width: 767px) calc((100vw - 2.5rem) / 2), 292px" loading="lazy" decoding="async" fetchpriority="low" width="2748" height="746" alt="Product screenshot 07" />
                                         </a>
                                         <a data-showcase-card href="https://www.kaggle.com/competitions/rsna-str-pulmonary-embolism-detection/writeups/aillis-yuji-jan-yama-provisional-8th-place-solutio" target="_blank" rel="noopener noreferrer" aria-label="Open product screenshot 08 in a new window">
-                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/rsna_str_black.png" data-dark-src="./images/rsna_str_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" loading="lazy" decoding="async" fetchpriority="low" width="2774" height="746" alt="Product screenshot 08" />
+                                            <img data-showcase-image class="rounded-xl shadow-lg" style="--rest-transform:translate3d(0,0,0) scale(1) rotate(0deg);--muted-transform:translate3d(0,0,0) scale(.98) rotate(0deg);--source-transform:translate3d(0,0,0) scale(1.04) rotate(0deg);" data-light-src="./images/optimized/rsna_str_black-360.webp" data-light-srcset="./images/optimized/rsna_str_black-360.webp 360w, ./images/optimized/rsna_str_black-720.webp 720w" data-light-preview-src="./images/optimized/rsna_str_black-1200.webp" data-light-fallback-src="./images/rsna_str_black.png" data-light-fallback-preview-src="./images/rsna_str_black.png" data-dark-src="./images/optimized/rsna_str_white-360.webp" data-dark-srcset="./images/optimized/rsna_str_white-360.webp 360w, ./images/optimized/rsna_str_white-720.webp 720w" data-dark-preview-src="./images/optimized/rsna_str_white-1200.webp" data-dark-fallback-src="./images/rsna_str_white.png" data-dark-fallback-preview-src="./images/rsna_str_white.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" sizes="(max-width: 767px) calc((100vw - 2.5rem) / 2), 292px" loading="lazy" decoding="async" fetchpriority="low" width="2774" height="746" alt="Product screenshot 08" />
                                         </a>
                                     </div>
                                     <script>
@@ -208,11 +298,8 @@
                                             const isDarkMode = document.documentElement.classList.contains('dark');
 
                                             showcaseImages.forEach((image) => {
-                                                const nextSrc = isDarkMode ? image.dataset.darkSrc : image.dataset.lightSrc;
-
-                                                if (nextSrc && image.getAttribute('src') !== nextSrc) {
-                                                    image.setAttribute('src', nextSrc);
-                                                }
+                                                window.__PI_BIND_IMAGE_FALLBACK(image);
+                                                window.__PI_APPLY_THEME_SOURCE(image, isDarkMode);
                                             });
                                         }());
                                     </script>
@@ -233,22 +320,19 @@
                                   <div class="p-5 rounded-xl bg-linear-to-tr from-gray-100 to-gray-50 dark:bg-linear-to-tr dark:from-gray-800 dark:to-gray-800/[0.65]">
                                   
                                   <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                                    Pattern Intelligence delivers production-ready computer vision systems for performance-critical applications.
+                                    Pattern Intelligence Inc. develops AI and machine learning technologies focused on computer vision and data analysis.
                                   </p>
                                   
                                   <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
                                   Founder<br>
                                   Yuji Ariyasu — Kaggle Grandmaster
                                   </p>
-<!--                                   
+                                  
                                   <p class="text-sm text-gray-600 dark:text-gray-400">
                                   Contact<br>
-                                  info@patternint.com
-                                  </p> -->
-                                  <p class="text-sm text-gray-600 dark:text-gray-400">
-                                    Contact<br>
-                                    <a href="mailto:info@patternint.com">info@patternint.com</a>
-                                    </p>                                  
+                                  patternintelligence@gmail.com
+                                  </p>
+                                  
                                   </div>
                                   </section>
 
@@ -315,7 +399,7 @@
 
         <div id="showcase-overlay" aria-hidden="true">
             <a id="showcase-overlay-link" href="#" target="_blank" rel="noopener noreferrer" aria-label="Open preview in a new window">
-                <img id="showcase-overlay-image" src="" alt="" />
+                <img id="showcase-overlay-image" src="" alt="" decoding="async" />
             </a>
         </div>
 
@@ -341,6 +425,18 @@
                 const overlayMaxWidth = 780;
                 const overlayHeightRatio = 0.50;
                 let activeCard = null;
+
+                showcaseImages.forEach((image) => {
+                    window.__PI_BIND_IMAGE_FALLBACK(image);
+                });
+
+                overlayImage.addEventListener('error', () => {
+                    const fallbackSrc = overlayImage.dataset.fallbackSrc;
+
+                    if (fallbackSrc && overlayImage.getAttribute('src') !== fallbackSrc) {
+                        overlayImage.setAttribute('src', fallbackSrc);
+                    }
+                });
 
                 const getInteractiveCard = () => {
                     const hoveredCard = cards.find((card) => card.matches(':hover'));
@@ -421,7 +517,8 @@
                     overlay.style.setProperty('--overlay-offset-y', `${offsetY}px`);
                     overlay.style.setProperty('--overlay-start-scale', `${startScale}`);
                     overlayLink.href = card.href;
-                    overlayImage.src = image.currentSrc || image.src;
+                    overlayImage.dataset.fallbackSrc = image.dataset.fallbackPreviewSrc || image.dataset.fallbackSrc || image.currentSrc || image.src;
+                    overlayImage.src = image.dataset.previewSrc || image.currentSrc || image.src;
                     overlayImage.alt = image.alt;
                     overlay.classList.add('is-visible');
                     overlay.setAttribute('aria-hidden', 'false');
@@ -436,20 +533,11 @@
                     applyPreviewState(null);
                 };
 
-                const getThemedImageSrc = (image, isDarkMode) => (
-                    isDarkMode ? image.dataset.darkSrc : image.dataset.lightSrc
-                );
-
                 const syncThemeImages = () => {
                     const isDarkMode = document.documentElement.classList.contains('dark');
 
                     showcaseImages.forEach((image) => {
-                        const currentSrc = image.getAttribute('src');
-                        const nextSrc = getThemedImageSrc(image, isDarkMode);
-
-                        if (nextSrc && nextSrc !== currentSrc) {
-                            image.setAttribute('src', nextSrc);
-                        }
+                        window.__PI_APPLY_THEME_SOURCE(image, isDarkMode);
                     });
 
                     if (activeCard) {
