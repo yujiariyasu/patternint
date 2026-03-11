@@ -54,7 +54,7 @@
             }
         </style>
         <script>
-            if (localStorage.getItem('dark-mode') === 'false' || !('dark-mode' in localStorage)) {
+            if (localStorage.getItem('dark-mode') === 'false') {
                 document.querySelector('html').classList.remove('dark');
             } else {
                 document.querySelector('html').classList.add('dark');

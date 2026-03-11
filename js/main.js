@@ -2,7 +2,7 @@
 const lightSwitches = document.querySelectorAll('.light-switch');
 if (lightSwitches.length > 0) {
   lightSwitches.forEach((lightSwitch, i) => {
-    if (localStorage.getItem('dark-mode') === 'true') {
+    if (localStorage.getItem('dark-mode') !== 'false') {
       // eslint-disable-next-line no-param-reassign
       lightSwitch.checked = true;
     }
