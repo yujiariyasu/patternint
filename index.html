@@ -64,13 +64,28 @@
                 display: inline-flex;
                 align-items: center;
                 gap: 0.2rem;
+                transition: color 160ms ease, text-decoration-color 160ms ease, text-decoration-thickness 160ms ease, text-underline-offset 160ms ease;
+                text-decoration: underline;
+                text-decoration-thickness: 1px;
+                text-underline-offset: 2px;
+                text-decoration-color: #d1d5db;
+            }
+
+            .result-link:hover,
+            .result-link:focus-visible {
+                color: #111827;
+                text-decoration-color: currentColor;
+                text-decoration-thickness: 1.5px;
+                text-underline-offset: 3px;
+            }
+
+            html.dark .result-link:hover,
+            html.dark .result-link:focus-visible {
+                color: #f3f4f6;
             }
 
             .result-link-icon {
-                display: inline-flex;
-                align-items: center;
-                font-size: 0.58em;
-                line-height: 1;
+                display: none;
             }
         </style>
         <script>
